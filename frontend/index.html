@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Soy Azul Claro</title>
+        <link rel="icon" type="image/icon" href="images/favicon.ico">
+        <style>
+            body {
+                margin-left: 30%;
+                margin-right: 30%;
+            }
+
+            form {
+                border: 2px solid;
+                border-radius: 10px;
+                background-color: lightgreen;
+                padding: 7px;
+            }
+
+            label, input {
+                margin: 2px;
+                padding: 4px;
+            }
+
+            h1 {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body style="background-color: skyblue;">
+        <h1>Formulario de prueba</h1>
+
+        <form action="#" method="get" enctype="multipart/form-data">
+
+            <label for="username:">username</label>
+            <input type="text" id="username" minlength="3" maxlength="15" placeholder="pikachu"><br>
+
+            <label for="password">password:</label>
+            <input type="password" id="password" minlength="4" placeholder="eg. 1234"><br>
+
+            <label for="email">email:</label>
+            <input type="email" id="email" placeholder="xyz@123.com"><br>
+
+            <label for="phone">phone:</label>
+            <input type="tel" id="phone" min="9" max="9" placeholder="987654321" pattern="[0-9]{9}"><br>
+
+            <label for="birthday">birthday:</label>
+            <input type="date" id="birthday"><br>
+
+            <label for="quantity">quantity:</label>
+            <input type="number" id="quantity" min="1" max="99" value="1"><br>
+
+            <label for="title">title:</label>
+
+            <label for="Mr.">Mr.</label>
+            <input type="radio" name="title" id="Mr.">
+            <label for="Mrs.">Mrs.</label>
+            <input type="radio" name="title" id="Mrs.">
+            <label for="PhD.">PhD.</label>
+            <input type="radio" name="title" id="PhD."><br>
+
+            <label for="payment">payment:</label>
+            <select id="payment">
+                <option value="Visa">Visa</option>
+                <option value="Visa">Mastercard</option>
+                <option value="Visa">AmEx</option>
+            </select><br>
+
+            <label for="subscribe">subscribe:</label>
+            <input type="checkbox" id="subscribe"><br>
+
+            <label for="comment">comment:</label>
+            <textarea id="comment" cols="24" rows="4"></textarea><br>
+
+            <label for="file">file:</label><br>
+            <input type="file" id="file" accept="image/jpeg, image/png"><br>
+
+            <input type="submit" value="submit">
+            <input type="reset" value="reset">
+        </form>
+        
+    </body>
+</html>
