@@ -30,4 +30,6 @@ public class ComputadoraController {
     public Computadora crearPcOficina() {
         return computadoraService.armarComputadora("PC de Oficina Básica", new OficinaFactory());
     }
+
+    // comentario de prueba armando
 }
