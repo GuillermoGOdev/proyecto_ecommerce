@@ -9,4 +9,6 @@ public class CalculadorPrecioService {
         double impuesto = base * 0.18;
         return base + impuesto;
     }
+
+    // comentario de prueba para ver cómo se hace merge entre ramas
 }
