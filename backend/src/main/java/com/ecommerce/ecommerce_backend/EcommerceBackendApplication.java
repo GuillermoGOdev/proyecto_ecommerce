@@ -2,18 +2,20 @@ package com.ecommerce.ecommerce_backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 
+/*
 import com.ecommerce.ecommerce_backend.builder.ComputadoraBuilder;
 import com.ecommerce.ecommerce_backend.factory.*;
 import com.ecommerce.ecommerce_backend.model.Computadora;
+*/
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
 public class EcommerceBackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EcommerceBackendApplication.class, args);
 
+		/*
 		//Elegimos que fabrica queremos emplear
 		ComponentesFactory miFactory = new GamerFactory();
 
@@ -29,6 +31,7 @@ public class EcommerceBackendApplication {
         System.out.println("CPU: " + miComputadora.getProcesador().getNombre());
         System.out.println("GPU: " + miComputadora.getTarjetaVideo().getNombre());
         System.out.println("Precio Total: $" + miComputadora.getPrecioTotal());
+		*/
 	}
 
 }
