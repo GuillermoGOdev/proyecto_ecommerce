@@ -59,6 +59,8 @@ function mostrarProductos(lista) {
                 <img src="${imgPath}" alt="${p.nombre}" onerror="this.onerror=null; this.src='https://placehold.co/150';">
                 <div class="card-body">
                     <h3>${p.nombre}</h3>
+                    <p class="stock">Disponible: <strong>${p.stockActual}</strong></p>
+
                     <p class="categoria"><span>${p.categoria ? p.categoria.nombre : 'General'}</span></p>
                     <p class="precio">S/${p.precio}</p>
                 </div>
