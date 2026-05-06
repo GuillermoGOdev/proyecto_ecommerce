@@ -1,36 +1,179 @@
+/* --- CONFIGURACIÓN GENERAL --- */
 body {
-    font-family: Arial;
-    background: #f5f5f5;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+    color: #333;
 }
 
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+/* --- CONTENEDOR DE PRODUCTOS --- */
 #contenedor-productos {
     display: flex;
-    gap: 20px;
+    gap: 25px;
     flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px 0;
 }
 
+/* --- TARJETA DE PRODUCTO (CARD) --- */
 .card {
     background: white;
+    width: 240px;
+    border-radius: 12px;
+    overflow: hidden; /* Para que la imagen respete el radio del borde */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* --- IMAGEN DEL PRODUCTO --- */
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain; /* Evita que la imagen se deforme */
+    background-color: #fff;
+    padding: 10px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 180px; 
+}
+
+/* --- CUERPO DE LA TARJETA --- */
+.card-body {
     padding: 15px;
-    border-radius: 10px;
-    width: 200px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .card h3 {
     margin: 0;
+    font-size: 1.1rem;
+    color: #1a1a1a;
+    min-height: 2.8em; /* Reserva espacio para nombres largos */
 }
 
-.card button {
-    margin-top: 10px;
+.categoria span {
+    background: #e9ecef;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.precio {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #28a745;
+    margin: 5px 0;
+}
+
+/* --- PIE DE LA TARJETA (BOTONES) --- */
+.card-footer {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto; /* Empuja los botones siempre al fondo */
+}
+
+/* Botón Comprar */
+.btn-comprar {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-comprar:hover {
+    background-color: #0056b3;
+}
+
+/* Contenedor de botones Admin */
+.acciones-admin {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-icon {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px;
     border: none;
-    background: #007bff;
-    color: white;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
 }
 
-.card button img {
-    width: 50%;
+.btn-icon:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+.btn-icon img {
+    width: 18px !important; /* Tamaño del icono */
+    height: 18px !important;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+#editar { background-color: #ffc107; }
+#eliminar { background-color: #dc3545; }
+
+/* --- FORMULARIO DE AGREGAR --- */
+h2 {
+    margin-top: 50px;
+    border-top: 2px solid #ddd;
+    padding-top: 30px;
+}
+
+.form-container { /* Sugerencia: envuelve tus inputs en un div con esta clase */
+    max-width: 400px;
+    margin: 0 auto 50px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+input, select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+button[onclick="agregarProducto()"] {
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }

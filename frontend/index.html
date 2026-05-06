@@ -12,9 +12,17 @@
     <div id="contenedor-productos"></div>
 
     <h2>Agregar Producto</h2>
-    <input type="text" id="nombre" placeholder="Nombre">
-    <input type="number" id="precio" placeholder="Precio">
-    <button onclick="agregarProducto()">Guardar</button>
+        <div class="form-container">
+            <input type="text" id="nombre" placeholder="Nombre">
+            <input type="number" id="precio" placeholder="Precio">
+            <input type="text" id="imagenURL" placeholder="URL de la imagen (https://...)">
+
+            <select id="categoria">
+                <option value="">Seleccione una categoría</option>
+            </select>
+
+            <button onclick="agregarProducto()">Guardar Producto</button>
+        </div>
     
     <script src="js/app.js"></script>
 </body>

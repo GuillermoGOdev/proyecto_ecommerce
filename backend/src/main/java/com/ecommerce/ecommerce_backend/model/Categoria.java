@@ -1,32 +1,23 @@
 package com.ecommerce.ecommerce_backend.model;
+import jakarta.persistence.*;
 
+@Entity
 public class Categoria {
 
-    private int id;
-    private String  nombre;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nombre;
 
-public Categoria(int id, String nombre) {
-        this.id = id;
+    public Categoria() {}
+
+    public Categoria(String nombre) {
         this.nombre = nombre;
     }
 
-public int getId() {
-    return id;
+    // Getters y Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 }
-
-public void setId(int id) {
-    this.id = id;
-}
-
-public String getNombre() {
-    return nombre;
-}
-
-public void setNombre(String nombre) {
-    this.nombre = nombre;
-}
-
-
-    
-}
-
