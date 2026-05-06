@@ -10,7 +10,7 @@ const API_CONFIG = {
 
 function cargarCategorias(data = null) {
     if (data === null) {
-        fetch("http://localhost:8080/categoria")
+        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`)
             .then(res => res.json())
             .then(actualizarInterfazCategorias);
     } else {
@@ -41,7 +41,7 @@ function actualizarInterfazCategorias(data) {
 let productosCargados = [];
 
 function cargarProductos() {
-    fetch("http://localhost:8080/producto")
+    fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`)
         .then(res => res.json())
         .then(data => {
             productosCargados = data; // Guardamos la copia
@@ -147,7 +147,7 @@ async function agregarProducto() {
 
     try {
         // 5. Petición al servidor
-        const response = await fetch("http://localhost:8080/producto", {
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -189,30 +189,36 @@ async function agregarProducto() {
     }
 }
 
-function editarProducto(id) {
-    fetch(`http://localhost:8080/producto/${id}`)
-        .then(res => res.json())
-        .then(producto => {
-            let nuevoNombre = prompt("Nuevo nombre: ", producto.nombre);
-            let nuevoPrecio = prompt("Nuevo precio: ", producto.precio);
+async function editarProducto(id) {
+    try {
+        const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}/${id}`);
+        const producto = await res.json();
 
-            if (nuevoNombre && nuevoPrecio) {
-                fetch(`http://localhost:8080/producto/${id}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        nombre: nuevoNombre,
-                        precio: nuevoPrecio,
-                        imagenURL: producto.imagenURL,
-                        categoria: producto.categoria
-                    })
+        let nuevoNombre = prompt("Nuevo nombre: ", producto.nombre);
+        let nuevoPrecio = prompt("Nuevo precio: ", producto.precio);
+
+        if (nuevoNombre && nuevoPrecio) {
+            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    nombre: nuevoNombre,
+                    precio: nuevoPrecio,
+                    imagenURL: producto.imagenURL,
+                    categoria: producto.categoria
                 })
-                .then(() => cargarProductos());
+            });
+
+            if (response.ok) {
+                showToast("Producto actualizado con éxito", "success");
+                cargarProductos();
+            } else {
+                throw new Error();
             }
-        })
-        .catch(error => console.error('Error al obtener producto:', error));
+        }
+    } catch (error) {
+        showToast("Error al editar el producto", "error");
+    }
 }
 
 async function eliminarProducto(id) {
@@ -246,12 +252,17 @@ function resaltarError(elemento, error = true) {
 }
 
 
+function comprar() {
+    showToast("¡Gracias por tu simulación de compra!", "success");
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Cargando datos iniciales...");
     
     Promise.all([
-        fetch("http://localhost:8080/categoria").then(res => res.json()),
-        fetch("http://localhost:8080/producto").then(res => res.json())
+        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`).then(res => res.json()),
+        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(res => res.json())
     ])
     .then(([categorias, productos]) => {
        
@@ -289,3 +300,4 @@ function showToast(mensaje, tipo = 'success') {
         toast.remove();
     }, 3000);
 }
+
