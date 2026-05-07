@@ -4,6 +4,9 @@ import com.ecommerce.ecommerce_backend.model.MovimientoInventario;
 import com.ecommerce.ecommerce_backend.model.Producto;
 import com.ecommerce.ecommerce_backend.repository.MovimientoRepository;
 import com.ecommerce.ecommerce_backend.service.IInventarioService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,5 +39,10 @@ public class InventarioServiceImpl implements IInventarioService {
     public Integer obtenerStockActual(Long productoId) {
         Integer stock = movimientoRepository.getStockActual(productoId);
         return (stock != null) ? stock : 0;
+    }
+
+    @Override
+    public List<MovimientoInventario> listarMovimientos() {
+        return movimientoRepository.findAll(); // O puedes usar uno ordenado por fecha
     }
 }

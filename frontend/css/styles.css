@@ -1,11 +1,59 @@
+/* Estilos para la Navbar */
+.navbar {
+    background-color: #2c3e50;
+    padding: 1rem 0;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    
+    /* SEGURIDAD DE ANCHO TOTAL */
+    width: 100%;
+    margin-top: 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links a {
+    color: #bdc3c7;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: white;
+    border-bottom: 2px solid #3498db;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 /* --- CONFIGURACIÓN GENERAL --- */
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background-color: #f8f9fa;
     margin: 0;
-    padding: 20px;
+    padding: 0px;
     color: #333;
 }
+
+
 
 h1, h2 {
     text-align: center;
@@ -261,4 +309,254 @@ button[onclick="agregarProducto()"] {
 
 #buscador:focus {
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+/*Estilos del stock*/
+.stock-bajo {
+    color: #dc3545; /* Rojo */
+    font-weight: bold;
+}
+
+.stock-normal {
+    color: #28a745; /* Verde */
+}
+
+/* Estilo para el botón de surtir */
+.btn-surtir {
+    background-color: #17a2b8; /* Azul cyan profesional */
+}
+
+
+/*ESTILOS DE LAS ACCIONES DE ADMINISTRADOR */
+.admin-actions {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.btn-principal {
+    background-color: #27ae60;
+    color: white;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 50px; /* Estilo redondeado moderno */
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-principal:hover {
+    transform: translateY(-2px);
+    background-color: #2ecc71;
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+/* --- ESTILOS DEL MODAL --- */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 2000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(44, 62, 80, 0.7); /* Color del Navbar con transparencia */
+    backdrop-filter: blur(5px); /* Efecto desenfoque */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10vh auto;
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    position: relative;
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.close {
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    font-size: 28px;
+    color: #95a5a6;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #e74c3c;
+}
+
+/* --- FORMULARIO DENTRO DEL MODAL --- */
+.form-container-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.form-container-modal h2 {
+    margin-bottom: 10px;
+    border: none;
+    padding: 0;
+}
+
+.form-container-modal .row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-container-modal .row input, 
+.form-container-modal .row select {
+    flex: 1;
+}
+
+.form-container-modal input, 
+.form-container-modal select {
+    padding: 12px 15px;
+    border: 1.5px solid #eee;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-container-modal input:focus {
+    border-color: #3498db;
+}
+
+.btn-guardar {
+    background-color: #2c3e50;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-guardar:hover {
+    background-color: #34495e;
+}
+
+
+
+/*ESTILOS DEL PANEL DE GESTION*/
+/* Header Administrativo */
+.admin-header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.admin-header h1 {
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+.btn-nav {
+    color: #bdc3c7;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.btn-nav:hover {
+    color: white;
+    background-color: rgba(255,255,255,0.1);
+}
+
+.btn-nav.active {
+    color: white;
+    background-color: #3498db;
+    font-weight: bold;
+}
+
+.table-section {
+    margin-top: 2rem;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.table-wrapper {
+    overflow-x: auto; /* Permite scroll horizontal en celulares */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+th {
+    background-color: #f8f9fa;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    padding: 15px;
+    border-bottom: 2px solid #eee;
+    text-align: left;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f1f1;
+    color: #34495e;
+    font-size: 0.95rem;
+}
+
+tr:hover {
+    background-color: #fcfcfc;
+}
+
+/* Colores para las operaciones */
+.badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.badge.entrada {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge.salida {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Resaltar la cantidad */
+.cantidad-positiva {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.cantidad-negativa {
+    color: #e74c3c;
+    font-weight: bold;
 }

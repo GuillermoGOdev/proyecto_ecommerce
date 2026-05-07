@@ -54,19 +54,27 @@ function mostrarProductos(lista) {
     let html = "";
     for (let p of lista) {
         let imgPath = p.imagenURL ? p.imagenURL : 'https://placehold.co/150';
+
+        let stockActual = (p.stock !== undefined) ? p.stock : 0;
+
+        let claseStock = stockActual < 5 ? 'stock-bajo' : 'stock-normal';
+        
         html += `
             <div class="card">
                 <img src="${imgPath}" alt="${p.nombre}" onerror="this.onerror=null; this.src='https://placehold.co/150';">
                 <div class="card-body">
                     <h3>${p.nombre}</h3>
-                    <p class="stock">Disponible: <strong>${p.stockActual}</strong></p>
-
+                    <p class="stock">Disponible: <strong class="${claseStock}">${stockActual}</strong></p>
                     <p class="categoria"><span>${p.categoria ? p.categoria.nombre : 'General'}</span></p>
                     <p class="precio">S/${p.precio}</p>
                 </div>
                 <div class="card-footer">
                     <button class="btn-comprar" onclick="comprar()">Comprar</button>
                     <div class="acciones-admin">
+                        <button class="btn-icon btn-surtir" onclick="surtirStock(${p.id})" title="Surtir Stock">
+                            <span style="font-size: 1.2rem;">📦</span>
+                        </button>
+
                         <button class="btn-icon btn-editar" onclick="editarProducto(${p.id})">
                             <img src="assets/icons/lapiz-blanco.png">
                         </button>
@@ -104,7 +112,7 @@ function filtrarProductos() {
 
 async function agregarProducto() {
     // 1. Referencias a los elementos del DOM
-    const btnGuardar = document.querySelector(".form-container button");
+    const btnGuardar = document.querySelector(".btn-guardar");
     const inputNombre = document.getElementById("nombre");
     const inputPrecio = document.getElementById("precio");
     const inputImagen = document.getElementById("imagenURL"); 
@@ -171,6 +179,7 @@ async function agregarProducto() {
             inputImagen.value = "";
             inputCategoria.value = "";
 
+            cerrarModal(); // Cerrar el modal después de guardar
             // Recargar la lista de productos
             cargarProductos();
         } else {
@@ -303,3 +312,48 @@ function showToast(mensaje, tipo = 'success') {
     }, 3000);
 }
 
+async function surtirStock(id) {
+    const cantidad = prompt("¿Cuántas unidades ingresan?");
+    if (!cantidad || isNaN(cantidad)) return;
+
+    try {
+        const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}/${id}/movimiento`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                cantidad: parseInt(cantidad),
+                tipo: "ENTRADA",
+                observacion: "Ingreso manual de mercadería"
+            })
+        });
+
+        if (res.ok) {
+            showToast("Stock actualizado", "success");
+            cargarProductos(); // Recarga para ver el nuevo número
+        }
+    } catch (error) {
+        showToast("Error al actualizar stock", "error");
+    }
+}
+
+// Abrir el modal
+function abrirModal() {
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "block";
+    document.body.style.overflow = "hidden"; // Evita scroll al estar abierto
+}
+
+// Cerrar el modal
+function cerrarModal() {
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "none";
+    document.body.style.overflow = "auto"; // Habilita el scroll de nuevo
+}
+
+// Cerrar si el usuario hace clic fuera del contenido blanco
+window.onclick = function(event) {
+    const modal = document.getElementById("modalProducto");
+    if (event.target == modal) {
+        cerrarModal();
+    }
+}

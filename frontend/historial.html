@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Historial de Inventario</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="admin-header">
+        <h1>Panel de Control E-commerce</h1>
+        <nav>
+            <a href="index.html" class="btn-nav">📦 Gestionar Productos</a>
+            <a href="historial.html" class="btn-nav active">📜 Historial de Stock</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="table-section">
+            <h2>Kardex de Movimientos</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>Operación</th>
+                            <th>Cantidad</th>
+                            <th>Motivo/Obs.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-historial">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/historial.js"></script>
+</body>
+</html>

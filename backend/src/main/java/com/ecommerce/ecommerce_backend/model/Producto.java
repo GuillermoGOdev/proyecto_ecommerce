@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Producto {
@@ -21,6 +22,9 @@ public class Producto {
     @ManyToOne 
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @Transient
+    private int stock;
 
     public Producto() {}
 
@@ -67,5 +71,13 @@ public class Producto {
 
     public void setImagenURL(String imagenURL) {
         this.imagenURL = imagenURL;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 }
