@@ -21,6 +21,8 @@ function cargarCategorias(data = null) {
 
 function actualizarInterfazCategorias(data) {
     let select = document.getElementById("categoria");
+    const filtroContenedor = document.getElementById("categorias-filtros");
+
     if (!select) return;
     
     if (!Array.isArray(data)) {
@@ -29,12 +31,65 @@ function actualizarInterfazCategorias(data) {
     }
 
     select.innerHTML = '<option value="">Seleccione una categoría</option>';
+    if (filtroContenedor) filtroContenedor.innerHTML = '';
+
+    const btnTodos = document.createElement("button");
+    btnTodos.className = "filter-btn active";
+    btnTodos.innerHTML = `Todos <span>${productosCargados.length}</span>`;
+    btnTodos.onclick = (e) => filtrarPorCategoria('TODOS', e.currentTarget);
+    filtroContenedor.appendChild(btnTodos);
+
     data.forEach(cat => {
         let option = document.createElement("option");
         option.value = cat.id;
         option.textContent = cat.nombre;
         select.appendChild(option);
+
+        // Calcular cuántos productos hay en esta categoría
+        const cantidad = productosCargados.filter(p => 
+            p.categoria && p.categoria.id === cat.id
+        ).length;
+
+        if (filtroContenedor) {
+            const btn = document.createElement("button");
+            btn.className = "filter-btn";
+            btn.textContent = cat.nombre;
+            btn.innerHTML = `${cat.nombre} <span>${cantidad}</span>`;
+            btn.onclick = (e) => filtrarPorCategoria(cat.nombre, e.currentTarget);
+            filtroContenedor.appendChild(btn);
+        }
     });
+}
+
+/*Metodo para reutilizar codigo*/
+async function refrescarInterfazCompleta() {
+    try {
+        // Pedimos los datos frescos al servidor
+        const [categorias, productos] = await Promise.all([
+            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`).then(res => res.json()),
+            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(res => res.json())
+        ]);
+
+        // Actualizamos la variable global
+        productosCargados = productos;
+
+        // Repintamos TODO
+        actualizarInterfazCategorias(categorias); 
+        filtrarProductos();
+        
+    } catch (error) {
+        console.error("Error al refrescar la interfaz:", error);
+    }
+}
+
+function filtrarPorCategoria(nombreCategoria, elemento) {
+    // Manejo de clase 'active' para los botones
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    elemento.classList.add('active');
+
+    // Guardamos la categoría elegida y ejecutamos el filtro maestro
+    categoriaSeleccionada = nombreCategoria;
+    filtrarProductos();
 }
 
 // Variable global para guardar los productos cargados
@@ -69,7 +124,7 @@ function mostrarProductos(lista) {
                     <p class="precio">S/${p.precio}</p>
                 </div>
                 <div class="card-footer">
-                    <button class="btn-comprar" onclick="comprar()">Comprar</button>
+                    <button class="btn-comprar" onclick="comprar(${p.id}, '${p.nombre}')">Comprar</button>
                     <div class="acciones-admin">
                         <button class="btn-icon btn-surtir" onclick="surtirStock(${p.id})" title="Surtir Stock">
                             <span style="font-size: 1.2rem;">📦</span>
@@ -94,18 +149,28 @@ function mostrarProductos(lista) {
     }
 }
 
+    let categoriaSeleccionada = 'TODOS'; // Variable global para la categoría seleccionada
 // LA FUNCIÓN DE FILTRO (Lo que ocurre al escribir)
 function filtrarProductos() {
+    // 1. Obtener valores de los controles
     const texto = document.getElementById("buscador").value.toLowerCase();
-    
-    // Filtramos el array global
+    const precioMax = parseFloat(document.getElementById("precioRange").value);
+    // 2. Actualizar el label visual del precio
+    document.getElementById("precioMaxLabel").textContent = `S/${precioMax}`;
+    // 3. Filtrar el array global de productos
     const filtrados = productosCargados.filter(p => {
-        const nombre = p.nombre.toLowerCase();
-        const categoria = p.categoria ? p.categoria.nombre.toLowerCase() : 'general';
-        return nombre.includes(texto) || categoria.includes(texto);
+        // Condición A: El nombre o la categoría coinciden con el buscador
+        const coincideTexto = p.nombre.toLowerCase().includes(texto) || 
+                             (p.categoria && p.categoria.nombre.toLowerCase().includes(texto));
+        // Condición B: El precio es menor o igual al del slider
+        const coincidePrecio = p.precio <= precioMax;
+        // Condición C: La categoría coincide con el botón seleccionado
+        const coincideCategoria = (categoriaSeleccionada === 'TODOS') || 
+                                 (p.categoria && p.categoria.nombre === categoriaSeleccionada);
+        // Solo si cumple las 3 condiciones, el producto pasa el filtro
+        return coincideTexto && coincidePrecio && coincideCategoria;
     });
-
-    // Mostramos solo los resultados que coinciden
+    // 4. Pintar los resultados filtrados
     mostrarProductos(filtrados);
 }
 
@@ -180,8 +245,7 @@ async function agregarProducto() {
             inputCategoria.value = "";
 
             cerrarModal(); // Cerrar el modal después de guardar
-            // Recargar la lista de productos
-            cargarProductos();
+            refrescarInterfazCompleta(); // Recarga completa para actualizar categorías y filtros
         } else {
             throw new Error("Error en la respuesta del servidor");
         }
@@ -241,7 +305,7 @@ async function eliminarProducto(id) {
 
             if (res.ok) {
                 showToast("Producto eliminado correctamente", "success");
-                cargarProductos(); // Recarga la lista
+                refrescarInterfazCompleta(); // Recarga completa para actualizar categorías y filtros
             } else {
                 throw new Error();
             }
@@ -262,11 +326,48 @@ function resaltarError(elemento, error = true) {
     }
 }
 
+async function comprar(id, nombre) {
+    const cantidad = prompt(`¿Cuántas unidades de ${nombre} desea comprar?`, "1");
 
-function comprar() {
-    showToast("¡Gracias por tu simulación de compra!", "success");
+    // Validaciones básicas de cliente
+    if (cantidad === null) return; 
+    const cantNum = parseInt(cantidad);
+    
+    if (isNaN(cantNum) || cantNum <= 0) {
+        showToast("Por favor, ingresa una cantidad válida", "warning");
+        return;
+    }
+
+    try {
+        // Usamos el endpoint que configuraste en tu InventarioServiceImpl
+        const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}/${id}/movimiento`;
+        
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                cantidad: cantNum,
+                tipo: "SALIDA",
+                observacion: "Venta directa desde panel"
+            })
+        });
+
+        // Si el servidor lanza el RuntimeException (Stock insuficiente)
+        if (!res.ok) {
+            // Intentamos obtener el mensaje de error del backend
+            const errorData = await res.json().catch(() => ({ message: "Error desconocido" }));
+            throw new Error(errorData.message || "No hay stock suficiente.");
+        }
+
+        showToast(`✅ Venta de ${nombre} exitosa`, "success");
+        refrescarInterfazCompleta(); // Esto actualizará los números en los botones y las cards
+
+    } catch (err) {
+        // Aquí es donde el administrador ve que no puede vender lo que no tiene
+        console.error("Error en la venta:", err.message);
+        showToast(err.message, "error");
+    }
 }
-
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Cargando datos iniciales...");
@@ -277,9 +378,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ])
     .then(([categorias, productos]) => {
        
-        cargarCategorias(categorias); 
-        
-        cargarProductos(); 
+        productosCargados = productos; // Guardamos los productos para filtros y búsquedas
+        actualizarInterfazCategorias(categorias); // Carga las categorías y también actualiza los filtros
+        mostrarProductos(productosCargados); // Muestra los productos en el HTML
         
         console.log("Carga completada con éxito");
     })

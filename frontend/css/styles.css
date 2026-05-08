@@ -292,6 +292,136 @@ button[onclick="agregarProducto()"] {
     to { opacity: 0; transform: translateY(-20px); }
 }
 
+
+/*ESTILOS FILTRO POR CATEGORIA*/
+.filtros-seccion {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #f5f5f5;
+}
+
+.filter-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border: 2px solid #007bff;
+    background-color: white;
+    color: #007bff;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #f0f7ff;
+}
+
+.filter-btn.active {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+
+/* --- CONTENEDOR DEL SLIDER DE PRECIO --- */
+.precio-filtro-container {
+    max-width: 500px;
+    margin: 20px auto; /* Centra el bloque entero horizontalmente */
+    padding: 25px;     /* Espacio interno para que nada toque los bordes */
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-sizing: border-box; /* CRÍTICO: asegura que el padding no estire el div */
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* Centra los hijos (label e input) */
+}
+
+.precio-filtro-container label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+#precioMaxLabel {
+    background: #e8f5e9; /* Verde suave de fondo */
+    color: #27ae60;    /* Verde profesional */
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-left: 5px;
+    border: 1px solid #c8e6c9;
+}
+
+/* --- ESTILOS DEL INPUT RANGE (EL SLIDER) --- */
+input[type=range] {
+    -webkit-appearance: none; /* Quita el estilo por defecto */
+    width: 100%;
+    background: transparent;
+    cursor: pointer;
+    border: none;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+/* La línea/pista del slider (Chrome, Safari, Edge) */
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    background: #dfe6e9;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+/* El círculo/botón del slider (Chrome, Safari, Edge) */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    background: #27ae60;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    margin-top: -7px; /* Centra el botón sobre la línea */
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* Efecto hover al tocar el botón */
+input[type=range]:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+    background: #219150;
+}
+
+/* La línea/pista (Firefox) */
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    background: #dfe6e9;
+    border-radius: 5px;
+}
+
+/* El botón (Firefox) */
+input[type=range]::-moz-range-thumb {
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    background: #27ae60;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+
 .search-container {
     margin: 20px 0;
     text-align: center;

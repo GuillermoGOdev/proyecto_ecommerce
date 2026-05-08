@@ -24,7 +24,8 @@ public class InventarioServiceImpl implements IInventarioService {
         if (tipo.equalsIgnoreCase("SALIDA")) {
             Integer stockActual = obtenerStockActual(producto.getId());
             if (stockActual < cantidad) {
-                throw new RuntimeException("No hay suficiente stock para " + producto.getNombre());
+                throw new RuntimeException("Stock insuficiente para " + producto.getNombre() + 
+                                     ". Disponible: " + stockActual + ", Solicitado: " + cantidad);
             }
             cantidad = -Math.abs(cantidad);
         } else {

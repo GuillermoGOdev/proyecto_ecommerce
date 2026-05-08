@@ -19,9 +19,18 @@
 
     <main class="container">
         <h1>Gestión de Productos</h1>
-        
+        <div class="filtros-seccion">
+            <div class="filter-container" id="categorias-filtros">
+            </div>
+        </div>
+
         <div class="search-container">
             <input type="text" id="buscador" placeholder="Buscar por nombre o categoría..." onkeyup="filtrarProductos()">
+        </div>
+
+        <div class="precio-filtro-container">
+            <label for="precioRange">Precio máximo: <span id="precioMaxLabel">S/9000</span></label>
+            <input type="range" id="precioRange" min="0" max="9000" step="50" value="9000" oninput="filtrarProductos()">
         </div>
 
         <div id="contenedor-productos"></div>
