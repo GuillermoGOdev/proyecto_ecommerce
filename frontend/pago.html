@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Proceso de Pago</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/pago-styles.css">
+</head>
+<body>
+    <div id="overlay" class="overlay">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; font-weight: 600;">Procesando su pago seguro...</p>
+    </div>
+
+<div class="checkout-container">
+    <div class="payment-form">
+        <h2>Detalles de Facturación</h2>
+        <form id="checkout-form">
+            <div class="form-group">
+                <label>Nombre Completo</label>
+                <input type="text" id="nombre-cliente" placeholder="Ej. Juan García" required>
+            </div>
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="email-cliente" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <h2 style="margin-top: 30px;">Información de Tarjeta</h2>
+            <div class="form-group">
+                <label>Número de Tarjeta</label>
+                <input type="text" placeholder="XXXX XXXX XXXX XXXX" maxlength="16" required>
+            </div>
+            <div class="row">
+                <div class="form-group" style="flex: 1;">
+                    <label>Expiración</label>
+                    <input type="text" placeholder="MM/AA" maxlength="5" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>CVC</label>
+                    <input type="password" placeholder="123" maxlength="3" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-pay" id="btn-finalizar">Confirmar Pago</button>
+            <div id="status-msg"></div>
+        </form>
+    </div>
+
+    <div class="order-summary">
+        <h2>Resumen del Pedido</h2>
+        <div class="item-detail">
+            <h4 id="prod-nombre">Cargando...</h4>
+            <p>Cantidad: 1 unidad</p>
+        </div>
+        <div class="total-row">
+            <span>Total:</span>
+            <span id="prod-total">S/ 0.00</span>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/pago.js"></script>
+</body>
+</html>

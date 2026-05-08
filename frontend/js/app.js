@@ -124,7 +124,7 @@ function mostrarProductos(lista) {
                     <p class="precio">S/${p.precio}</p>
                 </div>
                 <div class="card-footer">
-                    <button class="btn-comprar" onclick="comprar(${p.id}, '${p.nombre}')">Comprar</button>
+                    <button class="btn-comprar" onclick="irAPagar(${p.id}, '${p.nombre}', ${p.precio})">Comprar</button>
                     <div class="acciones-admin">
                         <button class="btn-icon btn-surtir" onclick="surtirStock(${p.id})" title="Surtir Stock">
                             <span style="font-size: 1.2rem;">📦</span>
@@ -326,7 +326,7 @@ function resaltarError(elemento, error = true) {
     }
 }
 
-async function comprar(id, nombre) {
+/*async function comprar(id, nombre) {
     const cantidad = prompt(`¿Cuántas unidades de ${nombre} desea comprar?`, "1");
 
     // Validaciones básicas de cliente
@@ -367,6 +367,12 @@ async function comprar(id, nombre) {
         console.error("Error en la venta:", err.message);
         showToast(err.message, "error");
     }
+}*/
+
+function irAPagar(id, nombre, precio) {
+    const pedido = { id, nombre, precio, cantidad: 1 };
+    localStorage.setItem('pedidoTemporal', JSON.stringify(pedido));
+    window.location.href = 'pago.html'; // Te lleva a la nueva página
 }
 
 document.addEventListener("DOMContentLoaded", () => {
