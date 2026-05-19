@@ -7,30 +7,41 @@ import java.util.List;
 @Service
 public class ProductoService {
 
-    
+    private final InventarioService inventarioService;
     private final ProductoRepository repository;
 
-    
-    public ProductoService(ProductoRepository repository) {
+    public ProductoService(ProductoRepository repository, InventarioService inventarioService) {
         this.repository = repository;
+        this.inventarioService = inventarioService;
     }
 
-    // MTODOS DE LÓGICA DE NEGOCIO
-    public List<Producto> obtenerTodos() {
-        return repository.findAll();
+    // LISTAR TODO CON STOCK CALCULADO
+    public List<Producto> listarTodos() {
+        List<Producto> productos = repository.findAll();
+        for (Producto p : productos) {
+            // Inyectamos el stock calculado antes de enviarlo al Frontend
+            int stockCalculado = inventarioService.obtenerStockActual(p.getId());
+            p.setStock(stockCalculado);
+        }
+        return productos;
     }
 
+    // OBTENER UNO CON STOCK CALCULADO
     public Producto obtenerPorId(Long id) {
-        return repository.findById(id)
+        Producto p = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("¡Ups! Producto no encontrado con ID: " + id));
+        
+        // También calculamos el stock aquí
+        p.setStock(inventarioService.obtenerStockActual(p.getId()));
+        return p;
     }
 
     public Producto guardar(Producto producto) {
+        // Al guardar, el stock es @Transient así que JPA lo ignorará automáticamente
         return repository.save(producto);
     }
 
     public void eliminar(Long id) {
-        // Antes de eliminar, podríamos verificar si el producto existe
         if (!repository.existsById(id)) {
             throw new RuntimeException("No se puede eliminar: Producto no existe");
         }
