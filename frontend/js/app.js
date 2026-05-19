@@ -65,7 +65,9 @@ function mostrarProductos(lista) {
                     <p class="precio">S/${p.precio}</p>
                 </div>
                 <div class="card-footer">
-                    <button class="btn-comprar" onclick="comprar()">Comprar</button>
+                    <button 
+                            class="btn-comprar" 
+                            onclick="agregarAlCarrito(${p.id})"> Agregar al carrito</button>
                     <div class="acciones-admin">
                         <button class="btn-icon btn-editar" onclick="editarProducto(${p.id})">
                             <img src="assets/icons/lapiz-blanco.png">
@@ -254,9 +256,6 @@ function resaltarError(elemento, error = true) {
 }
 
 
-function comprar() {
-    showToast("¡Gracias por tu simulación de compra!", "success");
-}
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -271,6 +270,8 @@ document.addEventListener("DOMContentLoaded", () => {
         cargarCategorias(categorias); 
         
         cargarProductos(); 
+
+        actualizarContadorCarrito();
         
         console.log("Carga completada con éxito");
     })
@@ -292,7 +293,7 @@ function showToast(mensaje, tipo = 'success') {
     // 2. Crear la notificación
     const toast = document.createElement('div');
     toast.className = `toast ${tipo}`;
-    toast.textContent = mensaje;
+    toast.innerHTML = `<div class="toast-text">${mensaje}</div>`;
 
     // 3. Agregar al contenedor
     container.appendChild(toast);
@@ -303,3 +304,70 @@ function showToast(mensaje, tipo = 'success') {
     }, 3000);
 }
 
+
+// ==========================
+// CARRITO
+// ==========================
+
+async function agregarAlCarrito(idProducto) {
+
+    try {
+
+        const response = await fetch(
+            `http://localhost:8080/api/carrito/agregar/${idProducto}?cantidad=1`,
+            {
+                method: "POST"
+            }
+        );
+
+        if(response.ok){
+
+            showToast("SE AGREGO AL CARRITO CON EXITO...", "success");
+
+            actualizarContadorCarrito();
+
+        }else{
+            throw new Error();
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast("No se pudo agregar al carrito", "error");
+    }
+}
+
+
+// ==========================
+// CONTADOR CARRITO
+// ==========================
+
+async function actualizarContadorCarrito(){
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/api/carrito"
+        );
+
+        const carrito = await response.json();
+
+        let cantidad = 0;
+
+        carrito.forEach(item => {
+            cantidad += item.cantidad;
+        });
+
+        const contador =
+            document.getElementById("contador-carrito");
+
+        if(contador){
+            contador.textContent = cantidad;
+        }
+
+    } catch(error){
+
+        console.error(error);
+    }
+}

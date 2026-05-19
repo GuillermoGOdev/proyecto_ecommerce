@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="top-bar">
+
+    <a href="carrito.html" class="btn-volver">
+        ← Volver al carrito
+    </a>
+
+</div>
+
+        <h1>💳 Checkout</h1>
+
+        <div id="resumen">
+
+        </div>
+
+        <div class="formulario">
+
+            <h2>Dirección</h2>
+
+            <input 
+                type="text"
+                id="direccion"
+                placeholder="Ingresa tu dirección"
+            >
+
+            <h2>Distrito</h2>
+
+            <select id="distrito">
+
+                <option value="Piura">Piura</option>
+                <option value="Castilla">Castilla</option>
+                <option value="Sullana">Sullana</option>
+
+            </select>
+
+            <h2>Método de pago</h2>
+
+            <select>
+
+                <option>Yape</option>
+                <option>Tarjeta</option>
+                <option>Transferencia</option>
+
+            </select>
+
+            <button onclick="finalizarCompra()">
+                Finalizar Compra
+            </button>
+
+        </div>
+
+    </div>
+
+    <script src="js/checkout.js"></script>
+
+</body>
+</html>
