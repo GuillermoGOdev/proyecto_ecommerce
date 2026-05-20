@@ -14,12 +14,16 @@ import java.util.stream.Collectors;
 @RequestMapping("/producto")
 public class ProductoController {
     
-    private IInventarioService inventarioService;
+    private final IInventarioService inventarioService;
     private final ProductoService productoService;
+    private final com.ecommerce.ecommerce_backend.facade.CompraFacade compraFacade;
 
-    public ProductoController(ProductoService productoService, IInventarioService inventarioService) {
+    public ProductoController(ProductoService productoService, 
+                              IInventarioService inventarioService,
+                              com.ecommerce.ecommerce_backend.facade.CompraFacade compraFacade) {
         this.productoService = productoService;
         this.inventarioService = inventarioService;
+        this.compraFacade = compraFacade;
     }
 
 
@@ -64,19 +68,28 @@ public class ProductoController {
     }
 
 
-    // AQUÍ DEBE ESTAR LA FUNCIÓN DEL MOVIMIENTO
     @PostMapping("/{id}/movimiento")
-    public void registrarMovimiento(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
-        // 1. Buscamos el producto en la DB
-        Producto producto = productoService.obtenerPorId(id);
-        
-        // 2. Extraemos los datos del JSON que mandó el Frontend
-        int cantidad = Integer.parseInt(payload.get("cantidad").toString());
-        String tipo = payload.get("tipo").toString(); // "ENTRADA" o "SALIDA"
-        String observacion = payload.get("observacion").toString();
+    public org.springframework.http.ResponseEntity<?> registrarMovimiento(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        try {
+            int cantidad = Integer.parseInt(payload.get("cantidad").toString());
+            String tipo = payload.get("tipo").toString(); // "ENTRADA" o "SALIDA"
+            String observacion = payload.get("observacion").toString();
 
-        // 3. Llamamos al servicio para que guarde el movimiento
-        inventarioService.registrarMovimiento(producto, cantidad, tipo, observacion);
+            // Patrón: Facade
+            if ("SALIDA".equalsIgnoreCase(tipo)) {
+                System.out.println("[ProductoController] Solicitud de compra recibida. Delegando a CompraFacade...");
+                compraFacade.procesarCompra(id, cantidad);
+            } else {
+                Producto producto = productoService.obtenerPorId(id);
+                inventarioService.registrarMovimiento(producto, cantidad, tipo, observacion);
+            }
+            
+            return org.springframework.http.ResponseEntity.ok().build();
+            
+        } catch (Exception e) {
+            System.err.println("[ProductoController] Error al procesar movimiento: " + e.getMessage());
+            return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

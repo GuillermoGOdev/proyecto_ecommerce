@@ -37,8 +37,15 @@ public class ProductoService {
     }
 
     public Producto guardar(Producto producto) {
-        // Al guardar, el stock es @Transient así que JPA lo ignorará automáticamente
-        return repository.save(producto);
+        // Patrón: Factory
+        Producto nuevoProducto = com.ecommerce.ecommerce_backend.factory.ProductoFactory.crearProducto(
+                producto.getNombre(),
+                producto.getPrecio(),
+                producto.getImagenURL(),
+                producto.getCategoria()
+        );
+        
+        return repository.save(nuevoProducto);
     }
 
     public void eliminar(Long id) {

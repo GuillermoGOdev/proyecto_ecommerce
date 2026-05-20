@@ -1,3 +1,37 @@
+// Alternar entre Tarjeta y PayPal (Patrón: Adapter)
+function alternarMetodoPago(metodo) {
+    const seccionTarjeta = document.getElementById('seccion-tarjeta');
+    const seccionPaypal = document.getElementById('seccion-paypal');
+    
+    const numTarjeta = document.getElementById('num-tarjeta');
+    const expTarjeta = document.getElementById('exp-tarjeta');
+    const cvcTarjeta = document.getElementById('cvc-tarjeta');
+    const btnFinalizar = document.getElementById('btn-finalizar');
+    
+    if (metodo === 'PAYPAL') {
+        if (seccionTarjeta) seccionTarjeta.style.display = 'none';
+        if (seccionPaypal) seccionPaypal.style.display = 'block';
+        
+        // Quitar 'required' para evitar validación de campos invisibles
+        if (numTarjeta) numTarjeta.removeAttribute('required');
+        if (expTarjeta) expTarjeta.removeAttribute('required');
+        if (cvcTarjeta) cvcTarjeta.removeAttribute('required');
+        
+        if (btnFinalizar) btnFinalizar.innerText = "Pagar con PayPal";
+    } else {
+        if (seccionTarjeta) seccionTarjeta.style.display = 'block';
+        if (seccionPaypal) seccionPaypal.style.display = 'none';
+        
+        // Restaurar 'required'
+        if (numTarjeta) numTarjeta.setAttribute('required', '');
+        if (expTarjeta) expTarjeta.setAttribute('required', '');
+        if (cvcTarjeta) cvcTarjeta.setAttribute('required', '');
+        
+        if (btnFinalizar) btnFinalizar.innerText = "Confirmar Pago";
+    }
+}
+window.alternarMetodoPago = alternarMetodoPago;
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Recuperar el pedido del localStorage
     const pedido = JSON.parse(localStorage.getItem('pedidoTemporal'));
@@ -22,7 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const overlay = document.getElementById('overlay');
+        const overlayMsg = document.getElementById('overlay-msg');
         const btnFinalizar = document.getElementById('btn-finalizar');
+        
+        // Obtener el método seleccionado
+        const metodoSeleccionado = document.querySelector('input[name="metodo-pago"]:checked').value;
         
         const cliente = {
             nombre: document.getElementById('nombre-cliente').value,
@@ -31,25 +69,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // UI: Bloquear botón y mostrar Spinner
         btnFinalizar.disabled = true;
+        
+        if (metodoSeleccionado === 'PAYPAL') {
+            overlayMsg.innerHTML = `Conectando con servidores de PayPal...<br><span style='font-size:0.85rem; font-weight:normal; color:#666;'>Procesando pago seguro</span>`;
+        } else {
+            overlayMsg.innerText = "Procesando su pago seguro con Tarjeta...";
+        }
+        
         overlay.style.display = 'flex'; 
 
-        // Simulación de delay (opcional, para que se vea el proceso)
+        // Simulación de delay (para simular comunicación con la pasarela)
         setTimeout(async () => {
             try {
-                // Llamada a tu API de Spring Boot
+                // Llamada a tu API de Spring Boot (ejecuta el CompraFacade y adapta la pasarela)
                 const response = await fetch(`http://localhost:8080/producto/${pedido.id}/movimiento`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         cantidad: 1,
                         tipo: 'SALIDA',
-                        observacion: `Venta Online - Cliente: ${cliente.email}`
+                        observacion: `Venta Online (${metodoSeleccionado}) - Cliente: ${cliente.email}`
                     })
                 });
 
                 if (response.ok) {
                     // ÉXITO: 1. Generar PDF
-                    await descargarPDF(pedido, cliente);
+                    await descargarPDF(pedido, cliente, metodoSeleccionado);
                     
                     // 2. Mostrar Toast
                     showToast("¡Pago exitoso! Se ha descargado su recibo.", "success");
@@ -79,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 3000);
 
                 } else {
-                    // ERROR de Backend (ej. Stock insuficiente)
+                    // ERROR de Backend (ej. Stock insuficiente, rol inválido, etc.)
                     const errorMsg = await response.text();
                     throw new Error(errorMsg);
                 }
@@ -88,14 +133,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // MANEJO DE ERROR
                 overlay.style.display = 'none'; // Quitar spinner para dejar al usuario corregir
                 btnFinalizar.disabled = false;
-                btnFinalizar.innerText = "Confirmar Pago";
+                btnFinalizar.innerText = metodoSeleccionado === 'PAYPAL' ? "Pagar con PayPal" : "Confirmar Pago";
                 showToast(err.message, "error");
             }
-        }, 1500); 
+        }, 1800); 
     });
 });
 
-// --- FUNCIONES DE APOYO (Fuera del DOMContentLoaded para orden) ---
+// --- FUNCIONES DE APOYO ---
 
 function showToast(mensaje, tipo = 'success') {
     let container = document.getElementById('toast-container');
@@ -111,7 +156,7 @@ function showToast(mensaje, tipo = 'success') {
     setTimeout(() => toast.remove(), 3000);
 }
 
-async function descargarPDF(pedido, cliente) {
+async function descargarPDF(pedido, cliente, metodoPago) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
@@ -123,19 +168,20 @@ async function descargarPDF(pedido, cliente) {
     doc.setTextColor(100);
     doc.text(`Cliente: ${cliente.nombre}`, 20, 50);
     doc.text(`Email: ${cliente.email}`, 20, 60);
-    doc.text(`Fecha: ${new Date().toLocaleString()}`, 20, 70);
+    doc.text(`Método de Pago: ${metodoPago}`, 20, 70);
+    doc.text(`Fecha: ${new Date().toLocaleString()}`, 20, 80);
     
-    doc.line(20, 75, 190, 75);
+    doc.line(20, 85, 190, 85);
     doc.setFont("helvetica", "bold");
-    doc.text("Producto", 20, 85);
-    doc.text("Total", 160, 85);
+    doc.text("Producto", 20, 95);
+    doc.text("Total", 160, 95);
     
     doc.setFont("helvetica", "normal");
-    doc.text(pedido.nombre, 20, 95);
-    doc.text(`S/ ${pedido.precio.toFixed(2)}`, 160, 95);
+    doc.text(pedido.nombre, 20, 105);
+    doc.text(`S/ ${pedido.precio.toFixed(2)}`, 160, 105);
     
-    doc.line(20, 105, 190, 105);
-    doc.text("Gracias por su compra.", 20, 115);
+    doc.line(20, 115, 190, 115);
+    doc.text(`Comprobante generado por sistema. Gracias por su compra con ${metodoPago}.`, 20, 125);
 
     doc.save(`Recibo_${pedido.id}_${Date.now()}.pdf`);
 }

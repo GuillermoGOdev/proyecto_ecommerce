@@ -10,13 +10,25 @@
 <body>
     <div id="overlay" class="overlay">
         <div class="spinner"></div>
-        <p style="margin-top: 15px; font-weight: 600;">Procesando su pago seguro...</p>
+        <p id="overlay-msg" style="margin-top: 15px; font-weight: 600; text-align: center;">Procesando su pago seguro...</p>
     </div>
 
 <div class="checkout-container">
     <div class="payment-form">
         <h2>Detalles de Facturación</h2>
         <form id="checkout-form">
+            <!-- Métodos de Pago -->
+            <div class="payment-methods-selector" style="display: flex; gap: 20px; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.95rem; color: #333; font-weight: 600;">
+                    <input type="radio" name="metodo-pago" value="TARJETA" checked style="width: auto; cursor: pointer; transform: scale(1.15);" onchange="alternarMetodoPago(this.value)">
+                    Tarjeta de Crédito
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.95rem; color: #333; font-weight: 600;">
+                    <input type="radio" name="metodo-pago" value="PAYPAL" style="width: auto; cursor: pointer; transform: scale(1.15);" onchange="alternarMetodoPago(this.value)">
+                    PayPal
+                </label>
+            </div>
+
             <div class="form-group">
                 <label>Nombre Completo</label>
                 <input type="text" id="nombre-cliente" placeholder="Ej. Juan García" required>
@@ -26,20 +38,33 @@
                 <input type="email" id="email-cliente" placeholder="ejemplo@correo.com" required>
             </div>
 
-            <h2 style="margin-top: 30px;">Información de Tarjeta</h2>
-            <div class="form-group">
-                <label>Número de Tarjeta</label>
-                <input type="text" placeholder="XXXX XXXX XXXX XXXX" maxlength="16" required>
+            <!-- Sección de Tarjeta (Se oculta si se elige PayPal) -->
+            <div id="seccion-tarjeta">
+                <h2 style="margin-top: 30px;">Información de Tarjeta</h2>
+                <div class="form-group">
+                    <label>Número de Tarjeta</label>
+                    <input type="text" id="num-tarjeta" placeholder="XXXX XXXX XXXX XXXX" maxlength="16" required>
+                </div>
+                <div class="row">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Expiración</label>
+                        <input type="text" id="exp-tarjeta" placeholder="MM/AA" maxlength="5" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>CVC</label>
+                        <input type="password" id="cvc-tarjeta" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
             </div>
-            <div class="row">
-                <div class="form-group" style="flex: 1;">
-                    <label>Expiración</label>
-                    <input type="text" placeholder="MM/AA" maxlength="5" required>
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>CVC</label>
-                    <input type="password" placeholder="123" maxlength="3" required>
-                </div>
+
+            <!-- Patrón: Adapter (Exposición) -->
+            <div id="seccion-paypal" style="display: none; margin-top: 30px; background: #ebf5ff; border: 1px dashed #66b2ff; padding: 20px; border-radius: 10px;">
+                <h3 style="margin-top: 0; color: #0056b3; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                   Servidor de Pagos de PayPal
+                </h3>
+                <p style="font-size: 0.88rem; color: #444; margin-bottom: 0; line-height: 1.45;">
+                   Pago procesado de forma segura a través de pasarela de pago externa.
+                </p>
             </div>
 
             <button type="submit" class="btn-pay" id="btn-finalizar">Confirmar Pago</button>

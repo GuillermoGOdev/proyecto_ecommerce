@@ -3,7 +3,6 @@ package com.ecommerce.ecommerce_backend.builder;
 import com.ecommerce.ecommerce_backend.model.*;
 
 public class ComputadoraBuilder {
-    // Estas son las piezas que el builder irá guardando
     private String nombreConfiguracion;
     private Procesador procesador;
     private MemoriaRam memoriaRam;
@@ -12,7 +11,6 @@ public class ComputadoraBuilder {
     private PlacaMadre placaMadre;
     private Case gabinete;
     private TarjetaRed tarjetaRed;
-
     
     public ComputadoraBuilder(String nombreConfiguracion) {
         this.nombreConfiguracion = nombreConfiguracion;
