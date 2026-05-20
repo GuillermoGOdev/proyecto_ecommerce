@@ -9,10 +9,19 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <span class="logo">E-commerce Admin</span>
-            <div class="nav-links">
+            <span class="logo" style="display: flex; align-items: center; gap: 8px;">UTP E-commerce</span>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 15px;">
                 <a href="index.html" class="active">Productos</a>
-                <a href="historial.html">Historial de Stock</a>
+                <a href="historial.html" id="nav-historial">Historial de Stock</a>
+                
+                <!-- Selector de Rol (Sin emojis) -->
+                <div class="rol-selector-container" style="display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px;">
+                    <label for="rol-select" style="color: white; font-weight: bold; font-size: 0.9rem;">Rol:</label>
+                    <select id="rol-select" onchange="cambiarRolDeSesion(this.value)" style="padding: 4px 8px; border-radius: 4px; border: none; font-weight: bold; background: #fff; cursor: pointer; font-size: 0.85rem;">
+                        <option value="CLIENTE">Comprador (Cliente)</option>
+                        <option value="ADMIN">Administrador</option>
+                    </select>
+                </div>
             </div>
         </div>
     </nav>

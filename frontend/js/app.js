@@ -147,6 +147,7 @@ function mostrarProductos(lista) {
     } else {
         contenedor.innerHTML = html;
     }
+    aplicarControlesDeRol();
 }
 
     let categoriaSeleccionada = 'TODOS'; // Variable global para la categoría seleccionada
@@ -376,6 +377,7 @@ function irAPagar(id, nombre, precio) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    cambiarRolDeSesion(rolActual);
     console.log("Cargando datos iniciales...");
     
     Promise.all([
@@ -462,5 +464,49 @@ window.onclick = function(event) {
     const modal = document.getElementById("modalProducto");
     if (event.target == modal) {
         cerrarModal();
+    }
+}
+
+// Sincronización de Rol (Singleton)
+let rolActual = localStorage.getItem('rolActual') || 'CLIENTE';
+
+async function cambiarRolDeSesion(rol) {
+    rolActual = rol;
+    localStorage.setItem('rolActual', rol);
+    
+    try {
+        const response = await fetch(`http://localhost:8080/api/sesion/cambiar-rol?rol=${rol}`, {
+            method: 'POST'
+        });
+        if (response.ok) {
+            const data = await response.json();
+            showToast(`Rol del Singleton: ${data.rol} (${data.nombre})`, "success");
+            aplicarControlesDeRol();
+        }
+    } catch (err) {
+        console.error("Error al sincronizar rol con el backend:", err);
+    }
+}
+
+function aplicarControlesDeRol() {
+    // Sincronizar el dropdown visual en la pantalla
+    const select = document.getElementById("rol-select");
+    if (select) select.value = rolActual;
+
+    const adminActions = document.querySelector(".admin-actions");
+    const accionesAdmin = document.querySelectorAll(".acciones-admin");
+    const btnComprar = document.querySelectorAll(".btn-comprar");
+    const navHistorial = document.getElementById("nav-historial");
+
+    if (rolActual === 'CLIENTE') {
+        if (adminActions) adminActions.style.display = "none";
+        accionesAdmin.forEach(el => el.style.display = "none");
+        btnComprar.forEach(el => el.style.display = "block");
+        if (navHistorial) navHistorial.style.display = "none"; // ESCONDE EL LINK DE HISTORIAL DE STOCK
+    } else {
+        if (adminActions) adminActions.style.display = "block";
+        accionesAdmin.forEach(el => el.style.display = "flex");
+        btnComprar.forEach(el => el.style.display = "none");
+        if (navHistorial) navHistorial.style.display = ""; // Vuelve a su visualización por defecto
     }
 }
