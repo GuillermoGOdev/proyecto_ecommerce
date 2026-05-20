@@ -6,13 +6,38 @@ const API_CONFIG = {
     }
 };
 
+// --- Caching Utilities ---
+const CACHE_KEYS = {
+    PRODUCTOS: "productos_cache",
+    CATEGORIAS: "categorias_cache"
+};
 
+function obtenerCache(key) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch (e) {
+        console.error(`Error al leer de la caché para la clave ${key}:`, e);
+        return null;
+    }
+}
+
+function guardarCache(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+        console.error(`Error al guardar en la caché para la clave ${key}:`, e);
+    }
+}
 
 function cargarCategorias(data = null) {
     if (data === null) {
         fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`)
             .then(res => res.json())
-            .then(actualizarInterfazCategorias);
+            .then(dataCategorias => {
+                guardarCache(CACHE_KEYS.CATEGORIAS, dataCategorias);
+                actualizarInterfazCategorias(dataCategorias);
+            });
     } else {
         actualizarInterfazCategorias(data);
     }
@@ -70,6 +95,10 @@ async function refrescarInterfazCompleta() {
             fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(res => res.json())
         ]);
 
+        // Guardamos en la caché
+        guardarCache(CACHE_KEYS.CATEGORIAS, categorias);
+        guardarCache(CACHE_KEYS.PRODUCTOS, productos);
+
         // Actualizamos la variable global
         productosCargados = productos;
 
@@ -99,6 +128,7 @@ function cargarProductos() {
     fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`)
         .then(res => res.json())
         .then(data => {
+            guardarCache(CACHE_KEYS.PRODUCTOS, data);
             productosCargados = data; // Guardamos la copia
             mostrarProductos(productosCargados); // Llamamos a una nueva función que pinta
         });
@@ -378,21 +408,45 @@ function irAPagar(id, nombre, precio) {
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Cargando datos iniciales...");
     
+    // Intentar cargar desde la caché primero para una carga instantánea
+    const cachedCategorias = obtenerCache(CACHE_KEYS.CATEGORIAS);
+    const cachedProductos = obtenerCache(CACHE_KEYS.PRODUCTOS);
+    let tieneCache = false;
+
+    if (cachedCategorias && cachedProductos) {
+        console.log("Cargando datos desde la caché local...");
+        productosCargados = cachedProductos;
+        actualizarInterfazCategorias(cachedCategorias);
+        mostrarProductos(productosCargados);
+        tieneCache = true;
+    }
+
+    // Petición al backend en segundo plano para actualizar y asegurar consistencia
     Promise.all([
         fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`).then(res => res.json()),
         fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(res => res.json())
     ])
     .then(([categorias, productos]) => {
-       
-        productosCargados = productos; // Guardamos los productos para filtros y búsquedas
-        actualizarInterfazCategorias(categorias); // Carga las categorías y también actualiza los filtros
-        mostrarProductos(productosCargados); // Muestra los productos en el HTML
+        console.log("Datos frescos recibidos del servidor. Actualizando caché y UI...");
         
-        console.log("Carga completada con éxito");
+        // Guardar en la caché
+        guardarCache(CACHE_KEYS.CATEGORIAS, categorias);
+        guardarCache(CACHE_KEYS.PRODUCTOS, productos);
+        
+        productosCargados = productos;
+        actualizarInterfazCategorias(categorias);
+        
+        // Usar filtrarProductos para respetar cualquier filtro o búsqueda activa del usuario
+        filtrarProductos();
+        
+        console.log("Carga completada con éxito y caché actualizada");
     })
     .catch(err => {
-        console.error("Error en la conexión:", err);
-        alert("Error al conectar con el backend. Revisa si Spring Boot está activo.");
+        console.error("Error en la conexión con el backend:", err);
+        // Solo alertar si no había datos en caché
+        if (!tieneCache) {
+            alert("Error al conectar con el backend. Revisa si Spring Boot está activo.");
+        }
     });
 });
 

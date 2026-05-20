@@ -54,6 +54,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 2. Mostrar Toast
                     showToast("¡Pago exitoso! Se ha descargado su recibo.", "success");
                     
+                    // Actualizar caché de productos para reflejar el descuento del stock inmediatamente al regresar
+                    const cachedProductos = localStorage.getItem("productos_cache");
+                    if (cachedProductos) {
+                        try {
+                            const productos = JSON.parse(cachedProductos);
+                            const productosActualizados = productos.map(p => {
+                                if (p.id === pedido.id) {
+                                    const stockActual = (p.stock !== undefined) ? p.stock : 0;
+                                    p.stock = Math.max(0, stockActual - 1);
+                                }
+                                return p;
+                            });
+                            localStorage.setItem("productos_cache", JSON.stringify(productosActualizados));
+                        } catch (e) {
+                            console.error("Error al actualizar la caché tras el pago:", e);
+                        }
+                    }
+                    
                     // 3. Redirigir
                     setTimeout(() => {
                         localStorage.removeItem('pedidoTemporal');
