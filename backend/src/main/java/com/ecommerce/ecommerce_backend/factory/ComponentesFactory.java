@@ -6,4 +6,8 @@ public interface ComponentesFactory {
     Procesador crearProcesador();
     MemoriaRam crearMemoriaRam();
     TarjetaVideo crearTarjetaVideo();
+    FuenteAlimentacion crearFuenteAlimentacion();
+    PlacaMadre crearPlacaMadre();
+    Case crearCase();
+    TarjetaRed crearTarjetaRed();
 }

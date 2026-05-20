@@ -13,6 +13,10 @@ public class ComputadoraService {
                 .conProcesador(fabrica.crearProcesador())
                 .conMemoriaRam(fabrica.crearMemoriaRam())
                 .conTarjetaVideo(fabrica.crearTarjetaVideo())
+                .conFuenteAlimentacion(fabrica.crearFuenteAlimentacion())
+                .conPlacaMadre(fabrica.crearPlacaMadre())
+                .conCase(fabrica.crearCase())
+                .conTarjetaRed(fabrica.crearTarjetaRed())
                 .build();
     }
 }
