@@ -1,12 +1,12 @@
 package com.ecommerce.ecommerce_backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Transient;
 
 @Entity
 public class Producto {
@@ -23,8 +23,8 @@ public class Producto {
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
-    @Transient
-    private int stock;
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int stock = 0;
 
     public Producto() {}
 

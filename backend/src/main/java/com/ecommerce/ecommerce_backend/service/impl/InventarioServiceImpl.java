@@ -3,6 +3,7 @@ package com.ecommerce.ecommerce_backend.service.impl;
 import com.ecommerce.ecommerce_backend.model.MovimientoInventario;
 import com.ecommerce.ecommerce_backend.model.Producto;
 import com.ecommerce.ecommerce_backend.repository.MovimientoRepository;
+import com.ecommerce.ecommerce_backend.repository.ProductoRepository;
 import com.ecommerce.ecommerce_backend.service.IInventarioService;
 
 import java.util.List;
@@ -16,22 +17,26 @@ public class InventarioServiceImpl implements IInventarioService {
 
     @Autowired
     private MovimientoRepository movimientoRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
 
     @Override
     @Transactional 
     public void registrarMovimiento(Producto producto, int cantidad, String tipo, String observacion) {
-        
+        Integer stockActual = obtenerStockActual(producto.getId());
         if (tipo.equalsIgnoreCase("SALIDA")) {
-            Integer stockActual = obtenerStockActual(producto.getId());
             if (stockActual < cantidad) {
                 throw new RuntimeException("Stock insuficiente para " + producto.getNombre() + 
                                      ". Disponible: " + stockActual + ", Solicitado: " + cantidad);
             }
+            producto.setStock(stockActual - cantidad);
             cantidad = -Math.abs(cantidad);
         } else {
+            producto.setStock(stockActual + Math.abs(cantidad));
             cantidad = Math.abs(cantidad);
         }
 
+        productoRepository.save(producto);
         MovimientoInventario movimiento = new MovimientoInventario(producto, cantidad, tipo, observacion);
         movimientoRepository.save(movimiento);
     }

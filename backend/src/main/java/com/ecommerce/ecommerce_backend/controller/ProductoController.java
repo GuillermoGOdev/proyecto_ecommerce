@@ -3,6 +3,7 @@ package com.ecommerce.ecommerce_backend.controller;
 import com.ecommerce.ecommerce_backend.model.Producto;
 import com.ecommerce.ecommerce_backend.service.IInventarioService;
 import com.ecommerce.ecommerce_backend.service.ProductoService;
+import com.ecommerce.ecommerce_backend.facade.CompraFacade;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -16,11 +17,11 @@ public class ProductoController {
     
     private final IInventarioService inventarioService;
     private final ProductoService productoService;
-    private final com.ecommerce.ecommerce_backend.facade.CompraFacade compraFacade;
+    private final CompraFacade compraFacade;
 
     public ProductoController(ProductoService productoService, 
                               IInventarioService inventarioService,
-                              com.ecommerce.ecommerce_backend.facade.CompraFacade compraFacade) {
+                              CompraFacade compraFacade) {
         this.productoService = productoService;
         this.inventarioService = inventarioService;
         this.compraFacade = compraFacade;
@@ -36,7 +37,7 @@ public class ProductoController {
         productoMap.put("precio", p.getPrecio());
         productoMap.put("imagenURL", p.getImagenURL());
         productoMap.put("categoria", p.getCategoria());
-        productoMap.put("stock", inventarioService.obtenerStockActual(p.getId()));
+        productoMap.put("stock", p.getStock());
         return productoMap;
         }).collect(Collectors.toList());
     }

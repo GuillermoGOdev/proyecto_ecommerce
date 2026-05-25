@@ -1,44 +1,31 @@
 package com.ecommerce.ecommerce_backend.service;
 import com.ecommerce.ecommerce_backend.model.Producto;
-import com.ecommerce.ecommerce_backend.repository.ProductoRepository;   
+import com.ecommerce.ecommerce_backend.repository.ProductoRepository;
+import com.ecommerce.ecommerce_backend.factory.ProductoFactory;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class ProductoService {
 
-    private final InventarioService inventarioService;
     private final ProductoRepository repository;
 
-    public ProductoService(ProductoRepository repository, InventarioService inventarioService) {
+    public ProductoService(ProductoRepository repository) {
         this.repository = repository;
-        this.inventarioService = inventarioService;
     }
 
-    // LISTAR TODO CON STOCK CALCULADO
     public List<Producto> listarTodos() {
-        List<Producto> productos = repository.findAll();
-        for (Producto p : productos) {
-            // Inyectamos el stock calculado antes de enviarlo al Frontend
-            int stockCalculado = inventarioService.obtenerStockActual(p.getId());
-            p.setStock(stockCalculado);
-        }
-        return productos;
+        return repository.findAll();
     }
 
-    // OBTENER UNO CON STOCK CALCULADO
     public Producto obtenerPorId(Long id) {
-        Producto p = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("¡Ups! Producto no encontrado con ID: " + id));
-        
-        // También calculamos el stock aquí
-        p.setStock(inventarioService.obtenerStockActual(p.getId()));
-        return p;
+        return repository.findById(id)
+            .orElseThrow(() -> new RuntimeException("¡Ups! Producto no encontrado con ID: " + id));
     }
 
     public Producto guardar(Producto producto) {
         // Patrón: Factory
-        Producto nuevoProducto = com.ecommerce.ecommerce_backend.factory.ProductoFactory.crearProducto(
+        Producto nuevoProducto = ProductoFactory.crearProducto(
                 producto.getNombre(),
                 producto.getPrecio(),
                 producto.getImagenURL(),
