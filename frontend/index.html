@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tienda</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-container">
@@ -13,11 +15,13 @@
             <div class="nav-links" style="display: flex; align-items: center; gap: 15px;">
                 <a href="index.html" class="active">Productos</a>
                 <a href="historial.html" id="nav-historial">Historial de Stock</a>
-                
+
                 <!-- Selector de Rol (Sin emojis) -->
-                <div class="rol-selector-container" style="display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px;">
+                <div class="rol-selector-container"
+                    style="display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px;">
                     <label for="rol-select" style="color: white; font-weight: bold; font-size: 0.9rem;">Rol:</label>
-                    <select id="rol-select" onchange="cambiarRolDeSesion(this.value)" style="padding: 4px 8px; border-radius: 4px; border: none; font-weight: bold; background: #fff; cursor: pointer; font-size: 0.85rem;">
+                    <select id="rol-select" onchange="cambiarRolDeSesion(this.value)"
+                        style="padding: 4px 8px; border-radius: 4px; border: none; font-weight: bold; background: #fff; cursor: pointer; font-size: 0.85rem;">
                         <option value="CLIENTE">Comprador (Cliente)</option>
                         <option value="ADMIN">Administrador</option>
                     </select>
@@ -34,7 +38,8 @@
         </div>
 
         <div class="search-container">
-            <input type="text" id="buscador" placeholder="Buscar por nombre o categoría..." onkeyup="filtrarProductos()">
+            <input type="text" id="buscador" placeholder="Buscar por nombre o categoría..."
+                onkeyup="filtrarProductos()">
         </div>
 
         <div class="precio-filtro-container">
@@ -79,28 +84,29 @@
         <div id="contenedor-productos"></div>
 
         <div class="admin-actions">
-    <button class="btn-principal" onclick="abrirModal()">+ Agregar Nuevo Producto</button>
-</div>
+            <button class="btn-principal" onclick="abrirModal()">+ Agregar Nuevo Producto</button>
+        </div>
 
-    <div id="modalProducto" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
-            <h2>Detalles del Producto</h2>
-            <div class="form-container-modal">
-                <input type="text" id="nombre" placeholder="Nombre del producto">
-            <div class="row">
-                <input type="number" id="precio" placeholder="Precio (S/)">
-                <select id="categoria">
-                    <option value="">Categoría</option>
-                </select>
-            </div>
-                <input type="text" id="imagenURL" placeholder="URL de la imagen">
-                <button class="btn-guardar" onclick="agregarProducto()">Guardar en Catálogo</button>
+        <div id="modalProducto" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="cerrarModal()">&times;</span>
+                <h2>Detalles del Producto</h2>
+                <div class="form-container-modal">
+                    <input type="text" id="nombre" placeholder="Nombre del producto">
+                    <div class="row">
+                        <input type="number" id="precio" placeholder="Precio (S/)">
+                        <select id="categoria">
+                            <option value="">Categoría</option>
+                        </select>
+                    </div>
+                    <input type="text" id="imagenURL" placeholder="URL de la imagen">
+                    <button class="btn-guardar" onclick="agregarProducto()">Guardar en Catálogo</button>
+                </div>
             </div>
         </div>
-    </div>
     </main>
-    
+
     <script src="js/app.js"></script>
 </body>
+
 </html>
