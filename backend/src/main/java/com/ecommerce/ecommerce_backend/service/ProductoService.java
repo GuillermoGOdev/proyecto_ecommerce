@@ -1,8 +1,10 @@
 package com.ecommerce.ecommerce_backend.service;
+
 import com.ecommerce.ecommerce_backend.model.Producto;
 import com.ecommerce.ecommerce_backend.repository.ProductoRepository;
 import com.ecommerce.ecommerce_backend.factory.ProductoFactory;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -20,7 +22,7 @@ public class ProductoService {
 
     public Producto obtenerPorId(Long id) {
         return repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("¡Ups! Producto no encontrado con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("¡Ups! Producto no encontrado con ID: " + id));
     }
 
     public Producto guardar(Producto producto) {
@@ -31,14 +33,21 @@ public class ProductoService {
                 producto.getImagenURL(),
                 producto.getCategoria()
         );
-        
+
         return repository.save(nuevoProducto);
     }
 
+//    public void eliminar(Long id) {
+//        if (!repository.existsById(id)) {
+//            throw new RuntimeException("No se puede eliminar: Producto no existe");
+//        }
+//        repository.deleteById(id);
+//    }
+    @Transactional
     public void eliminar(Long id) {
-        if (!repository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar: Producto no existe");
-        }
-        repository.deleteById(id);
+        Producto producto = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se puede eliminar: Producto no existe"));
+        repository.delete(producto);
     }
+
 }

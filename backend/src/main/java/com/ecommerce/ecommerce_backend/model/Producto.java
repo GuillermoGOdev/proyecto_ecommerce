@@ -7,26 +7,36 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 public class Producto {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nombre;
     private double precio;
     private String imagenURL;
 
-    @ManyToOne 
+    @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
     @Column(nullable = false, columnDefinition = "integer default 0")
     private int stock = 0;
 
-    public Producto() {}
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MovimientoInventario> movimientos = new ArrayList<>();
+
+    public Producto() {
+    }
 
     public Producto(String nombre, double precio) {
         this.nombre = nombre;
@@ -67,7 +77,7 @@ public class Producto {
 
     public String getImagenURL() {
         return imagenURL;
-    }       
+    }
 
     public void setImagenURL(String imagenURL) {
         this.imagenURL = imagenURL;
@@ -79,5 +89,13 @@ public class Producto {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public List<MovimientoInventario> getMovimientos() {
+        return movimientos;
+    }
+
+    public void setMovimientos(List<MovimientoInventario> movimientos) {
+        this.movimientos = movimientos;
     }
 }
