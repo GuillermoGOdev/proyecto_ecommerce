@@ -1,14 +1,25 @@
 package com.ecommerce.ecommerce_backend.controller;
-
-import com.ecommerce.ecommerce_backend.model.Producto;
-import com.ecommerce.ecommerce_backend.service.IInventarioService;
-import com.ecommerce.ecommerce_backend.service.ProductoService;
-import com.ecommerce.ecommerce_backend.facade.CompraFacade;
-
-import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ecommerce.ecommerce_backend.dto.DescuentoDTO;
+import com.ecommerce.ecommerce_backend.facade.CompraFacade;
+import com.ecommerce.ecommerce_backend.model.Producto;
+import com.ecommerce.ecommerce_backend.service.IInventarioService;
+import com.ecommerce.ecommerce_backend.service.ProductoService;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}) // Permite CORS para todos los orígenes y encabezados
@@ -58,10 +69,17 @@ public class ProductoController {
         return productoService.obtenerTodos();
     }*/
 
-    @GetMapping("/{id}")
-    public Producto getProducto(@PathVariable Long id) {
-        return productoService.obtenerPorId(id);
-    }
+@GetMapping("/{id}")
+public Producto getProducto(@PathVariable Long id) {
+    return productoService.obtenerPorId(id);
+}
+
+@GetMapping("/descuento")
+public List<DescuentoDTO> aplicarDescuento(@RequestParam String tipo) {
+
+    return productoService.aplicarDescuento(tipo);
+
+}
 
     @PostMapping
     public Producto agregarProducto(@RequestBody Producto producto) {
@@ -103,6 +121,7 @@ public class ProductoController {
         
         return productoService.guardar(existente);
     }
+
 
     @DeleteMapping("/{id}")
     public void eliminarProducto(@PathVariable Long id) {

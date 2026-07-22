@@ -135,41 +135,116 @@ function cargarProductos() {
 }
 
 // Nueva función separada para pintar en el HTML (Principio de Responsabilidad Única)
+// Nueva función separada para pintar en el HTML (Principio de Responsabilidad Única)
 function mostrarProductos(lista) {
+
     let html = "";
+
     for (let p of lista) {
+
         let imgPath = p.imagenURL ? p.imagenURL : 'https://placehold.co/150';
 
         let stockActual = (p.stock !== undefined) ? p.stock : 0;
 
         let claseStock = stockActual < 5 ? 'stock-bajo' : 'stock-normal';
-        
+
         html += `
             <div class="card">
+
                 <img src="${imgPath}" alt="${p.nombre}" onerror="this.onerror=null; this.src='https://placehold.co/150';">
+
                 <div class="card-body">
+
                     <h3>${p.nombre}</h3>
-                    <p class="stock">Disponible: <strong class="${claseStock}">${stockActual}</strong></p>
-                    <p class="categoria"><span>${p.categoria ? p.categoria.nombre : 'General'}</span></p>
-                    <p class="precio">S/${p.precio}</p>
+
+                    <p class="stock">
+                        Disponible:
+                        <strong class="${claseStock}">
+                            ${stockActual}
+                        </strong>
+                    </p>
+
+                    <p class="categoria">
+                        <span>${p.categoria ? p.categoria.nombre : 'General'}</span>
+                    </p>
+
+                    <p class="precio">
+
+                        ${
+                            p.precioOriginal
+                            ?
+
+                            `
+                            <span style="text-decoration:line-through;color:#999;font-size:14px;">
+                                S/${p.precioOriginal}
+                            </span>
+
+                            <br>
+
+                            <span style="color:#16a34a;font-size:22px;font-weight:bold;">
+                                S/${p.precio}
+                            </span>
+                            `
+
+                            :
+
+                            `
+                            <span style="font-size:22px;font-weight:bold;">
+                                S/${p.precio}
+                            </span>
+                            `
+                        }
+
+                    </p>
+
                 </div>
+
                 <div class="card-footer">
-                    <button class="btn-comprar" onclick="irAPagar(${p.id}, '${p.nombre}', ${p.precio})">Comprar</button>
+
+                    <button class="btn-comprar"
+                        onclick="irAPagar(${p.id}, '${p.nombre}', ${p.precio})">
+
+                        Comprar
+
+                    </button>
+
                     <div class="acciones-admin">
-                        <button class="btn-icon btn-surtir" onclick="surtirStock(${p.id})" title="Surtir Stock">
-                            <span style="font-size: 1.2rem;">📦</span>
+
+                        <button class="btn-icon btn-surtir"
+                            onclick="surtirStock(${p.id})"
+                            title="Surtir Stock">
+
+                            <span style="font-size:1.2rem;">📦</span>
+
                         </button>
 
-                        <button class="btn-icon btn-editar" onclick="editarProducto(${p.id})">
+                        <button class="btn-icon btn-editar"
+                            onclick="editarProducto(${p.id})">
+
                             <img src="assets/icons/lapiz-blanco.png">
+
                         </button>
-                        <button class="btn-icon btn-eliminar" onclick="eliminarProducto(${p.id})">
+
+                        <button class="btn-icon btn-eliminar"
+                            onclick="eliminarProducto(${p.id})">
+
                             <img src="assets/icons/basura-blanco.png">
+
                         </button>
+
                     </div>
+
                 </div>
-            </div>`;
+
+            </div>
+        `;
     }
+
+    document.getElementById("contenedor-productos").innerHTML = html;
+
+    actualizarVisibilidadAdmin();
+
+}
     
     const contenedor = document.getElementById("contenedor-productos");
     if (lista.length === 0) {
@@ -178,7 +253,7 @@ function mostrarProductos(lista) {
         contenedor.innerHTML = html;
     }
     aplicarControlesDeRol();
-}
+
 
     let categoriaSeleccionada = 'TODOS'; // Variable global para la categoría seleccionada
 // LA FUNCIÓN DE FILTRO (Lo que ocurre al escribir)
@@ -563,4 +638,28 @@ function aplicarControlesDeRol() {
         btnComprar.forEach(el => el.style.display = "none");
         if (navHistorial) navHistorial.style.display = ""; // Vuelve a su visualización por defecto
     }
+}
+async function calcularDescuento() {
+
+    const tipo = document.getElementById("tipoCliente").value;
+
+    try {
+
+        const response = await fetch(
+            `${API_CONFIG.BASE_URL}/producto/descuento?tipo=${tipo}`
+        );
+
+        productosCargados = await response.json();
+
+        mostrarProductos(productosCargados);
+
+        showToast("Descuento aplicado correctamente", "success");
+
+    } catch (error) {
+
+        console.error(error);
+
+
+    }
+
 }

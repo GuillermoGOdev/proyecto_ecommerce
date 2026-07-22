@@ -42,6 +42,40 @@
             <input type="range" id="precioRange" min="0" max="9000" step="50" value="9000" oninput="filtrarProductos()">
         </div>
 
+        <section class="strategy-card">
+
+    <div class="strategy-info">
+
+        <h2>💳 Simulador de Descuentos</h2>
+
+        <p>
+            Selecciona el tipo de cliente y descubre el precio final
+            utilizando el <strong>Patrón Strategy</strong>.
+        </p>
+
+    </div>
+
+    <div class="strategy-controls">
+
+        <select id="tipoCliente">
+
+            <option value="normal">Cliente Normal</option>
+            <option value="premium">Cliente Premium (10%)</option>
+            <option value="vip">Cliente VIP (20%)</option>
+            <option value="black">Black Friday (30%)</option>
+
+        </select>
+
+        <button onclick="calcularDescuento()">
+
+            Aplicar Descuento
+
+        </button>
+        <div id="resultadoDescuento"></div>
+
+    </div>
+</section>
+
         <div id="contenedor-productos"></div>
 
         <div class="admin-actions">

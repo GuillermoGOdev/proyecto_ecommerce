@@ -690,3 +690,140 @@ tr:hover {
     color: #e74c3c;
     font-weight: bold;
 }
+.strategy-card{
+
+    margin:35px auto;
+
+    width:100%;
+
+    background:linear-gradient(135deg,#1f2937,#111827);
+
+    border-radius:18px;
+
+    padding:30px;
+
+    color:white;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+.strategy-info{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+}
+
+.strategy-info h2{
+
+    margin-bottom:10px;
+
+    font-size:28px;
+
+}
+
+.strategy-info p{
+
+    color:#d1d5db;
+
+}
+
+.strategy-controls{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+    margin-bottom:25px;
+
+}
+
+.strategy-controls select{
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+    width:260px;
+
+    font-size:15px;
+
+}
+
+.strategy-controls button{
+
+    padding:12px 25px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#f59e0b;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.strategy-controls button:hover{
+
+    background:#d97706;
+
+}
+
+.strategy-result{
+
+    background:white;
+
+    color:#222;
+
+    border-radius:15px;
+
+    padding:20px;
+
+}
+
+.strategy-result h3{
+
+    text-align:center;
+
+    margin-bottom:15px;
+
+}
+
+.strategy-result p{
+
+    font-size:18px;
+
+    margin:10px 0;
+
+}
+
+.strategy-result span{
+
+    float:right;
+
+    font-weight:bold;
+
+}
+
+.precio-descuento{
+
+    color:#16a34a;
+
+    font-size:22px;
+
+}
