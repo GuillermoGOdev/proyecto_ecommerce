@@ -12,6 +12,9 @@ const CACHE_KEYS = {
     CATEGORIAS: "categorias_cache"
 };
 
+let productosCargados = [];
+let categoriaSeleccionada = 'TODOS';
+
 function obtenerCache(key) {
     try {
         const data = localStorage.getItem(key);
@@ -33,52 +36,54 @@ function guardarCache(key, data) {
 function cargarCategorias(data = null) {
     if (data === null) {
         fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`)
-            .then(res => res.json())
+            .then(async res => {
+                if (!res.ok) throw new Error(`Error ${res.status}`);
+                return res.json();
+            })
             .then(dataCategorias => {
                 guardarCache(CACHE_KEYS.CATEGORIAS, dataCategorias);
                 actualizarInterfazCategorias(dataCategorias);
-            });
+            })
+            .catch(err => console.error("Error al cargar categorías:", err));
     } else {
         actualizarInterfazCategorias(data);
     }
 }
 
-
 function actualizarInterfazCategorias(data) {
-    let select = document.getElementById("categoria");
+    const select = document.getElementById("categoria");
     const filtroContenedor = document.getElementById("categorias-filtros");
+    const listaProductos = Array.isArray(productosCargados) ? productosCargados : [];
 
     if (!select) return;
-    
+
     if (!Array.isArray(data)) {
         console.error("Los datos recibidos no son una lista válida:", data);
-        return; 
+        return;
     }
 
     select.innerHTML = '<option value="">Seleccione una categoría</option>';
     if (filtroContenedor) filtroContenedor.innerHTML = '';
 
-    const btnTodos = document.createElement("button");
-    btnTodos.className = "filter-btn active";
-    btnTodos.innerHTML = `Todos <span>${productosCargados.length}</span>`;
-    btnTodos.onclick = (e) => filtrarPorCategoria('TODOS', e.currentTarget);
-    filtroContenedor.appendChild(btnTodos);
+    if (filtroContenedor) {
+        const btnTodos = document.createElement("button");
+        btnTodos.className = "filter-btn active";
+        btnTodos.innerHTML = `Todos <span>${listaProductos.length}</span>`;
+        btnTodos.onclick = (e) => filtrarPorCategoria('TODOS', e.currentTarget);
+        filtroContenedor.appendChild(btnTodos);
+    }
 
     data.forEach(cat => {
-        let option = document.createElement("option");
+        const option = document.createElement("option");
         option.value = cat.id;
         option.textContent = cat.nombre;
         select.appendChild(option);
 
-        // Calcular cuántos productos hay en esta categoría
-        const cantidad = productosCargados.filter(p => 
-            p.categoria && p.categoria.id === cat.id
-        ).length;
+        const cantidad = listaProductos.filter(p => p.categoria && p.categoria.id === cat.id).length;
 
         if (filtroContenedor) {
             const btn = document.createElement("button");
             btn.className = "filter-btn";
-            btn.textContent = cat.nombre;
             btn.innerHTML = `${cat.nombre} <span>${cantidad}</span>`;
             btn.onclick = (e) => filtrarPorCategoria(cat.nombre, e.currentTarget);
             filtroContenedor.appendChild(btn);
@@ -86,197 +91,130 @@ function actualizarInterfazCategorias(data) {
     });
 }
 
-/*Metodo para reutilizar codigo*/
 async function refrescarInterfazCompleta() {
     try {
-        // Pedimos los datos frescos al servidor
         const [categorias, productos] = await Promise.all([
-            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`).then(res => res.json()),
-            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(res => res.json())
+            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`).then(async res => {
+                if (!res.ok) throw new Error(`Error ${res.status}`);
+                return res.json();
+            }),
+            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(async res => {
+                if (!res.ok) throw new Error(`Error ${res.status}`);
+                return res.json();
+            })
         ]);
 
-        // Guardamos en la caché
         guardarCache(CACHE_KEYS.CATEGORIAS, categorias);
         guardarCache(CACHE_KEYS.PRODUCTOS, productos);
 
-        // Actualizamos la variable global
         productosCargados = productos;
-
-        // Repintamos TODO
-        actualizarInterfazCategorias(categorias); 
+        actualizarInterfazCategorias(categorias);
         filtrarProductos();
-        
     } catch (error) {
         console.error("Error al refrescar la interfaz:", error);
     }
 }
 
 function filtrarPorCategoria(nombreCategoria, elemento) {
-    // Manejo de clase 'active' para los botones
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     elemento.classList.add('active');
 
-    // Guardamos la categoría elegida y ejecutamos el filtro maestro
     categoriaSeleccionada = nombreCategoria;
     filtrarProductos();
 }
 
-// Variable global para guardar los productos cargados
-let productosCargados = [];
-
 function cargarProductos() {
     fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`)
-        .then(res => res.json())
+        .then(async res => {
+            if (!res.ok) throw new Error(`Error ${res.status}`);
+            return res.json();
+        })
         .then(data => {
             guardarCache(CACHE_KEYS.PRODUCTOS, data);
-            productosCargados = data; // Guardamos la copia
-            mostrarProductos(productosCargados); // Llamamos a una nueva función que pinta
-        });
+            productosCargados = data;
+            mostrarProductos(productosCargados);
+        })
+        .catch(err => console.error("Error al cargar productos:", err));
 }
 
-// Nueva función separada para pintar en el HTML (Principio de Responsabilidad Única)
-// Nueva función separada para pintar en el HTML (Principio de Responsabilidad Única)
 function mostrarProductos(lista) {
+    const contenedor = document.getElementById("contenedor-productos");
+    if (!contenedor) return;
 
+    const productosAMostrar = Array.isArray(lista) ? lista : [];
     let html = "";
 
-    for (let p of lista) {
-
-        let imgPath = p.imagenURL ? p.imagenURL : 'https://placehold.co/150';
-
-        let stockActual = (p.stock !== undefined) ? p.stock : 0;
-
-        let claseStock = stockActual < 5 ? 'stock-bajo' : 'stock-normal';
+    for (let p of productosAMostrar) {
+        const imgPath = p.imagenURL ? p.imagenURL : 'https://placehold.co/150';
+        const stockActual = (p.stock !== undefined) ? p.stock : 0;
+        const claseStock = stockActual < 5 ? 'stock-bajo' : 'stock-normal';
 
         html += `
             <div class="card">
-
                 <img src="${imgPath}" alt="${p.nombre}" onerror="this.onerror=null; this.src='https://placehold.co/150';">
-
                 <div class="card-body">
-
                     <h3>${p.nombre}</h3>
-
                     <p class="stock">
                         Disponible:
-                        <strong class="${claseStock}">
-                            ${stockActual}
-                        </strong>
+                        <strong class="${claseStock}">${stockActual}</strong>
                     </p>
-
                     <p class="categoria">
                         <span>${p.categoria ? p.categoria.nombre : 'General'}</span>
                     </p>
-
                     <p class="precio">
-
-                        ${
-                            p.precioOriginal
-                            ?
-
-                            `
-                            <span style="text-decoration:line-through;color:#999;font-size:14px;">
-                                S/${p.precioOriginal}
-                            </span>
-
+                        ${p.precioOriginal ? `
+                            <span style="text-decoration:line-through;color:#999;font-size:14px;">S/${p.precioOriginal}</span>
                             <br>
-
-                            <span style="color:#16a34a;font-size:22px;font-weight:bold;">
-                                S/${p.precio}
-                            </span>
-                            `
-
-                            :
-
-                            `
-                            <span style="font-size:22px;font-weight:bold;">
-                                S/${p.precio}
-                            </span>
-                            `
-                        }
-
+                            <span style="color:#16a34a;font-size:22px;font-weight:bold;">S/${p.precio}</span>
+                        ` : `<span style="font-size:22px;font-weight:bold;">S/${p.precio}</span>`}
                     </p>
-
                 </div>
-
                 <div class="card-footer">
-
-                    <button class="btn-comprar"
-                        onclick="irAPagar(${p.id}, '${p.nombre}', ${p.precio})">
-
-                        Comprar
-
-                    </button>
-
+                    <button class="btn-comprar" onclick="irAPagar(${p.id}, '${p.nombre}', ${p.precio})">Comprar</button>
                     <div class="acciones-admin">
-
-                        <button class="btn-icon btn-surtir"
-                            onclick="surtirStock(${p.id})"
-                            title="Surtir Stock">
-
+                        <button class="btn-icon btn-surtir" onclick="surtirStock(${p.id})" title="Surtir Stock">
                             <span style="font-size:1.2rem;">📦</span>
-
                         </button>
-
-                        <button class="btn-icon btn-editar"
-                            onclick="editarProducto(${p.id})">
-
+                        <button class="btn-icon btn-editar" onclick="editarProducto(${p.id})">
                             <img src="assets/icons/lapiz-blanco.png">
-
                         </button>
-
-                        <button class="btn-icon btn-eliminar"
-                            onclick="eliminarProducto(${p.id})">
-
+                        <button class="btn-icon btn-eliminar" onclick="eliminarProducto(${p.id})">
                             <img src="assets/icons/basura-blanco.png">
-
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
         `;
     }
 
-    document.getElementById("contenedor-productos").innerHTML = html;
+    contenedor.innerHTML = productosAMostrar.length === 0
+        ? '<p class="mensaje-vacio">No se encontraron productos.</p>'
+        : html;
 
-    actualizarVisibilidadAdmin();
-
-}
-    
-    const contenedor = document.getElementById("contenedor-productos");
-    if (lista.length === 0) {
-        contenedor.innerHTML = '<p class="mensaje-vacio">No se encontraron productos.</p>';
-    } else {
-        contenedor.innerHTML = html;
-    }
     aplicarControlesDeRol();
+}
 
-
-    let categoriaSeleccionada = 'TODOS'; // Variable global para la categoría seleccionada
-// LA FUNCIÓN DE FILTRO (Lo que ocurre al escribir)
 function filtrarProductos() {
-    // 1. Obtener valores de los controles
-    const texto = document.getElementById("buscador").value.toLowerCase();
-    const precioMax = parseFloat(document.getElementById("precioRange").value);
-    // 2. Actualizar el label visual del precio
-    document.getElementById("precioMaxLabel").textContent = `S/${precioMax}`;
-    // 3. Filtrar el array global de productos
-    const filtrados = productosCargados.filter(p => {
-        // Condición A: El nombre o la categoría coinciden con el buscador
-        const coincideTexto = p.nombre.toLowerCase().includes(texto) || 
-                             (p.categoria && p.categoria.nombre.toLowerCase().includes(texto));
-        // Condición B: El precio es menor o igual al del slider
+    const buscador = document.getElementById("buscador");
+    const precioRange = document.getElementById("precioRange");
+    const precioMaxLabel = document.getElementById("precioMaxLabel");
+
+    const texto = buscador ? buscador.value.toLowerCase() : "";
+    const precioMax = precioRange ? parseFloat(precioRange.value) : Infinity;
+
+    if (precioMaxLabel) {
+        precioMaxLabel.textContent = `S/${precioMax}`;
+    }
+
+    const filtrados = (Array.isArray(productosCargados) ? productosCargados : []).filter(p => {
+        const coincideTexto = p.nombre.toLowerCase().includes(texto) ||
+            (p.categoria && p.categoria.nombre.toLowerCase().includes(texto));
         const coincidePrecio = p.precio <= precioMax;
-        // Condición C: La categoría coincide con el botón seleccionado
-        const coincideCategoria = (categoriaSeleccionada === 'TODOS') || 
-                                 (p.categoria && p.categoria.nombre === categoriaSeleccionada);
-        // Solo si cumple las 3 condiciones, el producto pasa el filtro
+        const coincideCategoria = (categoriaSeleccionada === 'TODOS') ||
+            (p.categoria && p.categoria.nombre === categoriaSeleccionada);
         return coincideTexto && coincidePrecio && coincideCategoria;
     });
-    // 4. Pintar los resultados filtrados
+
     mostrarProductos(filtrados);
 }
 
@@ -481,50 +419,48 @@ function irAPagar(id, nombre, precio) {
     window.location.href = 'pago.html'; // Te lleva a la nueva página
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    cambiarRolDeSesion(rolActual);
-    console.log("Cargando datos iniciales...");
-    
-    // Intentar cargar desde la caché primero para una carga instantánea
+document.addEventListener("DOMContentLoaded", async () => {
+    aplicarControlesDeRol();
+
     const cachedCategorias = obtenerCache(CACHE_KEYS.CATEGORIAS);
     const cachedProductos = obtenerCache(CACHE_KEYS.PRODUCTOS);
-    let tieneCache = false;
 
     if (cachedCategorias && cachedProductos) {
-        console.log("Cargando datos desde la caché local...");
         productosCargados = cachedProductos;
         actualizarInterfazCategorias(cachedCategorias);
         mostrarProductos(productosCargados);
-        tieneCache = true;
     }
 
-    // Petición al backend en segundo plano para actualizar y asegurar consistencia
-    Promise.all([
-        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`).then(res => res.json()),
-        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(res => res.json())
-    ])
-    .then(([categorias, productos]) => {
-        console.log("Datos frescos recibidos del servidor. Actualizando caché y UI...");
-        
-        // Guardar en la caché
+    try {
+        const [categorias, productos] = await Promise.all([
+            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATEGORIAS}`).then(async res => {
+                if (!res.ok) throw new Error(`Error ${res.status}`);
+                return res.json();
+            }),
+            fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PRODUCTOS}`).then(async res => {
+                if (!res.ok) throw new Error(`Error ${res.status}`);
+                return res.json();
+            })
+        ]);
+
         guardarCache(CACHE_KEYS.CATEGORIAS, categorias);
         guardarCache(CACHE_KEYS.PRODUCTOS, productos);
-        
+
         productosCargados = productos;
         actualizarInterfazCategorias(categorias);
-        
-        // Usar filtrarProductos para respetar cualquier filtro o búsqueda activa del usuario
         filtrarProductos();
-        
-        console.log("Carga completada con éxito y caché actualizada");
-    })
-    .catch(err => {
+    } catch (err) {
         console.error("Error en la conexión con el backend:", err);
-        // Solo alertar si no había datos en caché
-        if (!tieneCache) {
+        if (!cachedCategorias || !cachedProductos) {
             alert("Error al conectar con el backend. Revisa si Spring Boot está activo.");
         }
-    });
+    }
+
+    try {
+        await cambiarRolDeSesion(rolActual);
+    } catch (err) {
+        console.error("No se pudo sincronizar el rol inicial:", err);
+    }
 });
 
 function showToast(mensaje, tipo = 'success') {
@@ -602,23 +538,25 @@ let rolActual = localStorage.getItem('rolActual') || 'CLIENTE';
 async function cambiarRolDeSesion(rol) {
     rolActual = rol;
     localStorage.setItem('rolActual', rol);
-    
+
     try {
-        const response = await fetch(`http://localhost:8080/api/sesion/cambiar-rol?rol=${rol}`, {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/api/sesion/cambiar-rol?rol=${rol}`, {
             method: 'POST'
         });
         if (response.ok) {
             const data = await response.json();
-            showToast(`Rol del Singleton: ${data.rol} (${data.nombre})`, "success");
-            aplicarControlesDeRol();
+            if (document.getElementById("rol-select")) {
+                showToast(`Rol actualizado: ${data.rol}`, "success");
+            }
         }
     } catch (err) {
         console.error("Error al sincronizar rol con el backend:", err);
     }
+
+    aplicarControlesDeRol();
 }
 
 function aplicarControlesDeRol() {
-    // Sincronizar el dropdown visual en la pantalla
     const select = document.getElementById("rol-select");
     if (select) select.value = rolActual;
 
@@ -631,12 +569,12 @@ function aplicarControlesDeRol() {
         if (adminActions) adminActions.style.display = "none";
         accionesAdmin.forEach(el => el.style.display = "none");
         btnComprar.forEach(el => el.style.display = "block");
-        if (navHistorial) navHistorial.style.display = "none"; // ESCONDE EL LINK DE HISTORIAL DE STOCK
+        if (navHistorial) navHistorial.style.display = "none";
     } else {
         if (adminActions) adminActions.style.display = "block";
         accionesAdmin.forEach(el => el.style.display = "flex");
         btnComprar.forEach(el => el.style.display = "none");
-        if (navHistorial) navHistorial.style.display = ""; // Vuelve a su visualización por defecto
+        if (navHistorial) navHistorial.style.display = "";
     }
 }
 async function calcularDescuento() {
